@@ -8,7 +8,7 @@ const server = new ApolloServer({ typeDefs, resolvers });
 
 const main = async () => {
   try {
-    await models.sequelize.sync();
+    await models.sequelize.sync({ force: true });
     await server.listen().then(({ url }) => {
       // eslint-disable-next-line no-console
       console.log(`🚀  Server ready at ${url}`);
