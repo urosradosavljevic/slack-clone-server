@@ -6,6 +6,9 @@ import { fileLoader, mergeTypes, mergeResolvers } from "merge-graphql-schemas";
 // import resolvers from "./resolvers/resolvers";
 import models from "./models";
 
+const SECRET = "asdfnaiu12408u931kljd";
+const SECRET2 = "asdfnaiu12asdfg3408u931kljd";
+
 const typeDefs = mergeTypes(fileLoader(path.join(__dirname, "./schema")));
 
 const resolvers = mergeResolvers(
@@ -15,7 +18,7 @@ const resolvers = mergeResolvers(
 const server = new ApolloServer({
   typeDefs,
   resolvers,
-  context: { models, user: { id: 1 } },
+  context: { models, user: { id: 1 }, SECRET, SECRET2 },
 });
 
 const main = async () => {
