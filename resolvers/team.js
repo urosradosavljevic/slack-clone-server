@@ -1,12 +1,19 @@
+import { formatErrors } from "../helpers/formatErrors";
+
 export default {
   Mutation: {
     createTeam: async (parent, args, { models, user }) => {
       try {
-        await models.Team.create({ ...args, owner: user.id });
-        return true;
+        const team = await models.Team.create({ ...args, owner: user.id });
+        return {
+          ok: true,
+          team,
+        };
       } catch (err) {
-        console.error(err);
-        return false;
+        return {
+          ok: false,
+          errors: formatErrors(err, models),
+        };
       }
     },
   },

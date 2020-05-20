@@ -11,7 +11,6 @@ export default gql`
   type Query {
     getUser(id: Int!): User!
     allUsers: [User]!
-    login(email: String!, password: String!): LoginResponse!
   }
 
   type RegisterResponse {
@@ -33,5 +32,6 @@ export default gql`
       email: String!
       password: String!
     ): RegisterResponse!
+    login(email: String!, password: String!): LoginResponse!
   }
 `;
