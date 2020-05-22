@@ -44,6 +44,8 @@ const server = new ApolloServer({
         res.set("x-refresh-token", newTokens.refreshToken);
         return { models, user: newTokens.user, SECRET, SECRET2 };
       }
+
+      return { models, user: null, SECRET, SECRET2 };
     }
   },
 });
