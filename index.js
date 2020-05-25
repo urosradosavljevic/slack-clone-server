@@ -3,8 +3,6 @@ import path from "path";
 import { fileLoader, mergeTypes, mergeResolvers } from "merge-graphql-schemas";
 import jwt from "jsonwebtoken";
 
-// import typeDefs from "./schema/schema";
-// import resolvers from "./resolvers/resolvers";
 import models from "./models";
 import { refreshTokens } from "./helpers/auth";
 
