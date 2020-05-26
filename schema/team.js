@@ -4,7 +4,7 @@ export default gql`
   type Team {
     id: Int!
     name: String!
-    owner: User!
+    owner: Int!
     members: [User!]!
     channels: [Channel!]!
   }
@@ -15,12 +15,19 @@ export default gql`
     errors: [Error!]
   }
 
+  type VoidResponse {
+    ok: Boolean!
+    errors: [Error!]
+  }
+
   type Query {
     getTeam(id: Int!): Boolean!
     allTeams: [Team!]!
+    inviteTeams: [Team!]!
   }
 
   type Mutation {
     createTeam(name: String!): CreateTeamResponse!
+    createTeamMember(email: String!, teamId: Int!): VoidResponse!
   }
 `;

@@ -2,11 +2,11 @@ import _ from "lodash";
 
 export const formatErrors = (e, models) => {
   if (e instanceof models.Sequelize.UniqueConstraintError) {
-    const name = e.original.constraint.split("_")[1];
+    const name = e.original.constraint.split("_")[0];
     return [
       {
         path: name,
-        message: `User with this ${name} already exists.`,
+        message: `This ${name} already exists.`,
       },
     ];
   }
