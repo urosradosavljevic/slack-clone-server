@@ -3,7 +3,6 @@ export default (sequelize, DataTypes) => {
     name: DataTypes.STRING,
     public: { type: DataTypes.BOOLEAN, defaultValue: true },
   });
-
   Channel.associate = (models) => {
     // 1:M
     Channel.belongsTo(models.Team, {

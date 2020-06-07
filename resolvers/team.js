@@ -2,32 +2,21 @@ import { formatErrors } from "../helpers/formatErrors";
 import { requiresAuth } from "../helpers/permissions";
 
 export default {
-  Query: {
-    allTeams: requiresAuth.createResolver(
-      async (parent, args, { models, user }) =>
-        models.Team.findAll({ where: { owner: user.id } }, { raw: true })
-    ),
-    inviteTeams: requiresAuth.createResolver(
-      async (parent, args, { models, user }) =>
-        models.sequelize.query(
-          "select * from teams join members on id = team_id where user_id = ?",
-          {
-            replacements: [user.id],
-            model: models.Team,
-          }
-        )
-    ),
-  },
   Mutation: {
     createTeam: requiresAuth.createResolver(
       async (parent, args, { models, user }) => {
         try {
           const response = await models.sequelize.transaction(async () => {
-            const team = await models.Team.create({ ...args, owner: user.id });
+            const team = await models.Team.create({ ...args });
             await models.Channel.create({
               name: "general",
               public: true,
               teamId: team.id,
+            });
+            await models.Member.create({
+              teamId: team.id,
+              userId: user.id,
+              admin: true,
             });
             return team;
           });
@@ -47,19 +36,22 @@ export default {
     createTeamMember: requiresAuth.createResolver(
       async (parent, { email, teamId }, { models, user }) => {
         try {
-          const teamPromise = models.Team.findOne({ where: { id: teamId } });
-
           const userToAddPromise = models.User.findOne(
             { where: { email } },
             { raw: true }
           );
 
-          const [team, userToAdd] = await Promise.all([
-            teamPromise,
+          const memberToCheckPromise = models.Member.findOne(
+            { where: { userId: user.id, teamId } },
+            { raw: true }
+          );
+
+          const [userToAdd, memberToCheck] = await Promise.all([
             userToAddPromise,
+            memberToCheckPromise,
           ]);
 
-          if (team.owner !== user.id) {
+          if (!memberToCheck.admin) {
             return {
               ok: false,
               errors: [
@@ -100,5 +92,14 @@ export default {
   Team: {
     channels: ({ id }, args, { models }) =>
       models.Channel.findAll({ where: { teamId: id } }),
+    members: ({ id }, args, { models }) =>
+      models.sequelize.query(
+        "select * from users as user join members as member on user.id = member.user_id where member.team_id = ?",
+        {
+          replacements: [id],
+          model: models.User,
+          raw: true,
+        }
+      ),
   },
 };

@@ -6,7 +6,7 @@ export default gql`
     name: String!
     public: Boolean!
     messages: [Message!]!
-    users: [User!]!
+    members: [User!]!
   }
 
   type CreateChannelResponse {

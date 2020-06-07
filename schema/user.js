@@ -9,7 +9,7 @@ export default gql`
   }
 
   type Query {
-    getUser(id: Int!): User!
+    me: User!
     allUsers: [User]!
   }
 

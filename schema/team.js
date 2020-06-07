@@ -7,6 +7,7 @@ export default gql`
     owner: Int!
     members: [User!]!
     channels: [Channel!]!
+    admin: Boolean
   }
 
   type CreateTeamResponse {
