@@ -15,8 +15,9 @@ export default gql`
     newChannelMessage(channelId: Int!): Message
   }
 
-  type MessageVoidResponse {
+  type MessageResponse {
     ok: Boolean!
+    message: Message
     errors: [Error!]
   }
 
@@ -25,6 +26,6 @@ export default gql`
   }
 
   type Mutation {
-    sendMessage(channelId: Int!, text: String!): MessageVoidResponse!
+    sendMessage(channelId: Int!, text: String!): MessageResponse!
   }
 `;

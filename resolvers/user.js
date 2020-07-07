@@ -16,12 +16,17 @@ export default {
         }
       ),
   },
+
   Query: {
     me: requiresAuth.createResolver((parent, args, { models, user }) =>
       models.User.findOne({ where: { id: user.id } })
     ),
+    user: requiresAuth.createResolver((parent, { userId }, { models }) =>
+      models.User.findOne({ where: { id: userId } })
+    ),
     allUsers: (parent, args, { models }) => models.User.findAll(),
   },
+
   Mutation: {
     register: async (parent, { password, ...otherArgs }, { models }) => {
       try {

@@ -25,6 +25,7 @@ export default gql`
     getTeam(id: Int!): Boolean!
     allTeams: [Team!]!
     inviteTeams: [Team!]!
+    teamMembers(teamId: Int): [User]!
   }
 
   type Mutation {

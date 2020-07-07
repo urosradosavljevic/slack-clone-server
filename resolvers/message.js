@@ -1,6 +1,5 @@
 import { PubSub, withFilter } from "apollo-server";
 import { formatErrors } from "../helpers/formatErrors";
-import { requiresAuth } from "../helpers/permissions";
 
 const NEW_CHANNEL_MESSAGE = "NEW_CHANNEL_MESSAGE";
 // publish subscribe engine
@@ -41,6 +40,7 @@ export default {
 
         return {
           ok: true,
+          message,
         };
       } catch (err) {
         return {
