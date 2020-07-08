@@ -6,7 +6,7 @@ export default {
     teamMembers: requiresAuth.createResolver(
       async (parent, { teamId }, { models, user }) =>
         models.sequelize.query(
-          'select * from users as u join members as member on member.user_id = u.id where member.team_id = ?',
+          "select * from users as u join members as member on member.user_id = u.id where member.team_id = ?",
           {
             replacements: [teamId],
             model: models.User,
@@ -88,10 +88,14 @@ export default {
             };
           }
 
-          await models.Member.create({ userId: userToAdd.id, teamId });
+          const member = await models.Member.create({
+            userId: userToAdd.id,
+            teamId,
+          });
 
           return {
             ok: true,
+            member,
           };
         } catch (err) {
           return {
@@ -105,20 +109,14 @@ export default {
   Team: {
     channels: ({ id }, args, { models }) =>
       models.Channel.findAll({ where: { teamId: id } }),
-    members: async ({ id }, args, { models }) => {
-      console.log("id", id);
-      console.log(typeof id);
-      const users = await models.sequelize.query(
-        "select * from users as user join members as member on user.id = member.user_id where member.team_id = ?",
+    directMessagedMembers: async ({ id }, args, { models, user }) =>
+      models.sequelize.query(
+        "select distinct on (u.id) u.id,u.email,u.username,u.password from users as u join direct_messages as dm on (u.id = dm.sender_id) or (u.id = dm.receiver_id) where (:currentUserId = dm.sender_id or :currentUserId = dm.receiver_id) and dm.team_id = :teamId",
         {
-          replacements: [id],
+          replacements: { currentUserId: user.id, teamId: id },
           model: models.User,
           raw: true,
         }
-      );
-      console.log("printing users");
-      console.log(users);
-      return users;
-    },
+      ),
   },
 };

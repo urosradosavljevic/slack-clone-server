@@ -5,8 +5,8 @@ export default gql`
     id: Int!
     name: String!
     owner: Int!
-    members: [User!]!
     channels: [Channel!]!
+    directMessagedMembers: [User!]!
     admin: Boolean
   }
 
