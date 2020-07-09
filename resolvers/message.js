@@ -1,9 +1,11 @@
 import { PubSub, withFilter } from "apollo-server";
+
 import { formatErrors } from "../helpers/formatErrors";
+import { requiresAuth } from "../helpers/permissions";
+import pubsub from "../pubsub";
 
 const NEW_CHANNEL_MESSAGE = "NEW_CHANNEL_MESSAGE";
 // publish subscribe engine
-const pubsub = new PubSub();
 
 export default {
   Subscription: {
@@ -16,13 +18,15 @@ export default {
     },
   },
   Query: {
-    channelMessages: async (parent, { channelId }, { models }) => {
-      const messages = await models.Message.findAll(
-        { order: [["createdAt", "ASC"]], where: { channelId } },
-        { raw: true }
-      );
-      return messages;
-    },
+    channelMessages: requiresAuth.createResolver(
+      async (parent, { channelId }, { models }) => {
+        const messages = await models.Message.findAll(
+          { order: [["createdAt", "ASC"]], where: { channelId } },
+          { raw: true }
+        );
+        return messages;
+      }
+    ),
   },
   Mutation: {
     sendMessage: async (parent, args, { models, user }) => {

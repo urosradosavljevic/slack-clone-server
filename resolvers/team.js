@@ -88,6 +88,23 @@ export default {
             };
           }
 
+          const memberExists = await models.Member.findOne({
+            userId: userToAdd.id,
+            teamId,
+          });
+
+          if (memberExists) {
+            return {
+              ok: false,
+              errors: [
+                {
+                  path: "email",
+                  message: "This user is already member of this team",
+                },
+              ],
+            };
+          }
+
           const member = await models.Member.create({
             userId: userToAdd.id,
             teamId,

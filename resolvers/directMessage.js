@@ -1,28 +1,49 @@
-import { PubSub, withFilter } from "apollo-server";
+import { withFilter } from "apollo-server";
+
 import { formatErrors } from "../helpers/formatErrors";
+import pubsub from "../pubsub";
+import { directMessageSubscriptionAuth } from "../helpers/permissions";
 
 const NEW_DIRECT_MESSAGE = "NEW_DIRECT_MESSAGE";
-// publish subscribe engine
-const pubsub = new PubSub();
 
 export default {
   Subscription: {
     newDirectMessage: {
       // Get notified by pubsub engine when new message has been sent
-      subscribe: withFilter(
-        () => pubsub.asyncIterator([NEW_DIRECT_MESSAGE]),
-        (payload, { receiverId, teamId }) =>
-          payload.receiverId === receiverId && payload.teamId === teamId
+      subscribe: directMessageSubscriptionAuth.createResolver(
+        withFilter(
+          () => pubsub.asyncIterator(NEW_DIRECT_MESSAGE),
+          (payload, { userId, teamId }, { user }) =>
+            payload.teamId === teamId &&
+            ((payload.receiverId === user.id && payload.senderId === userId) ||
+              (payload.receiverId === userId && payload.senderId === user.id))
+        )
       ),
     },
   },
 
   Query: {
-    directMessages: async (parent, { receiverId, teamId }, { models, user }) =>
+    directMessages: async (parent, { userId, teamId }, { models, user }) =>
       models.DirectMessage.findAll(
         {
           order: [["createdAt", "ASC"]],
-          where: { receiverId, senderId: user.id, teamId },
+          where: {
+            teamId,
+            [models.Sequelize.Op.or]: [
+              {
+                [models.Sequelize.Op.and]: [
+                  { receiverId: userId },
+                  { senderId: user.id },
+                ],
+              },
+              {
+                [models.Sequelize.Op.and]: [
+                  { receiverId: user.id },
+                  { senderId: userId },
+                ],
+              },
+            ],
+          },
         },
         { raw: true }
       ),
@@ -39,12 +60,17 @@ export default {
         // Notify pubsub engine that message has been sent
         pubsub.publish(NEW_DIRECT_MESSAGE, {
           receiverId: args.receiverId,
+          senderId: user.id,
           teamId: args.teamId,
-          newChannelMessage: message.dataValues,
+          newDirectMessage: {
+            ...message.dataValues,
+            sender: user,
+          },
         });
 
         return {
           ok: true,
+          message,
         };
       } catch (err) {
         return {
@@ -56,11 +82,11 @@ export default {
   },
 
   DirectMessage: {
-    receiver: ({ receiverId, senderId }, args, { models }) => {
+    receiver: ({ receiverId }, args, { models }) => {
       return models.User.findOne({ where: { id: receiverId } });
     },
-    sender: ({ receiverId, senderId }, args, { models }) => {
-      return models.User.findOne({ where: { id: senderId } });
+    sender: ({ sender, senderId }, args, { models }) => {
+      return sender ? sender : models.User.findOne({ where: { id: senderId } });
     },
   },
 };

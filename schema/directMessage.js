@@ -10,11 +10,11 @@ export default gql`
   }
 
   type Subscription {
-    newDirectMessage(receiverId: Int!, teamId: Int!): DirectMessage
+    newDirectMessage(userId: Int!, teamId: Int!): DirectMessage
   }
 
   type Query {
-    directMessages(receiverId: Int!, teamId: Int!): [DirectMessage!]!
+    directMessages(userId: Int!, teamId: Int!): [DirectMessage!]!
   }
 
   type MessageResponse {
