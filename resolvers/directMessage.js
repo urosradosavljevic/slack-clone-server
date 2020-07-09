@@ -18,13 +18,14 @@ export default {
   },
 
   Query: {
-    directMessages: async (parent, { receiverId, teamId }, { models }) => {
-      const directMessages = await models.DirectMessage.findAll(
-        { order: [["createdAt", "ASC"]], where: { receiverId, teamId } },
+    directMessages: async (parent, { receiverId, teamId }, { models, user }) =>
+      models.DirectMessage.findAll(
+        {
+          order: [["createdAt", "ASC"]],
+          where: { receiverId, senderId: user.id, teamId },
+        },
         { raw: true }
-      );
-      return directMessages;
-    },
+      ),
   },
 
   Mutation: {
