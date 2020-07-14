@@ -19,6 +19,23 @@ export default {
     createTeam: requiresAuth.createResolver(
       async (parent, args, { models, user }) => {
         try {
+          const teamToAdd = await models.Team.findOne(
+            { where: { name: args.name } },
+            { raw: true }
+          );
+
+          if (teamToAdd) {
+            return {
+              ok: false,
+              errors: [
+                {
+                  path: "name",
+                  message: "Team with this name already exist",
+                },
+              ],
+            };
+          }
+
           const response = await models.sequelize.transaction(async () => {
             const team = await models.Team.create({ ...args });
             await models.Channel.create({
