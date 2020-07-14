@@ -16,7 +16,8 @@ export default {
           (payload, { userId, teamId }, { user }) =>
             payload.teamId === teamId &&
             ((payload.receiverId === user.id && payload.senderId === userId) ||
-              (payload.receiverId === userId && payload.senderId === user.id))
+              (payload.receiverId === userId && payload.senderId === user.id) ||
+              (payload.receiverId === user.id && payload.senderId === user.id))
         )
       ),
     },
@@ -40,6 +41,12 @@ export default {
                 [models.Sequelize.Op.and]: [
                   { receiverId: user.id },
                   { senderId: userId },
+                ],
+              },
+              {
+                [models.Sequelize.Op.and]: [
+                  { receiverId: user.id },
+                  { senderId: user.id },
                 ],
               },
             ],

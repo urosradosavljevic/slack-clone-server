@@ -37,7 +37,9 @@ export const directMessageSubscriptionAuth = createResolver(
       },
     });
     if (members.length !== 2) {
-      throw new Error("Something went wrong!");
+      if (userId !== user.id) {
+        throw new Error("Something went wrong!");
+      }
     }
   }
 );
