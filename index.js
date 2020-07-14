@@ -89,6 +89,7 @@ const server = new ApolloServer({
 
 const main = async () => {
   try {
+    // await models.sequelize.sync({force: !!process.env.TEST_DB});
     await models.sequelize.sync({});
     await server.listen().then(({ url, subscriptionsUrl }) => {
       // eslint-disable-next-line no-console

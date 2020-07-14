@@ -1,0 +1,2 @@
+dropdb testslack
+createdb testslack
