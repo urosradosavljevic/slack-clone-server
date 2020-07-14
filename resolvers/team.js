@@ -105,10 +105,15 @@ export default {
             };
           }
 
-          const memberExists = await models.Member.findOne({
-            userId: userToAdd.id,
-            teamId,
-          });
+          const memberExists = await models.Member.findOne(
+            {
+              where: {
+                userId: userToAdd.id,
+                teamId,
+              },
+            },
+            { raw: true }
+          );
 
           if (memberExists) {
             return {
