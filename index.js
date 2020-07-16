@@ -1,4 +1,7 @@
 import { ApolloServer } from "apollo-server";
+import express from "express";
+import { createServer } from "http";
+
 import path from "path";
 import { fileLoader, mergeTypes, mergeResolvers } from "merge-graphql-schemas";
 import jwt from "jsonwebtoken";
@@ -86,6 +89,11 @@ const server = new ApolloServer({
     }
   },
 });
+// express server for serving static content
+const app = express();
+
+app.use("./uploadedFiles", express.static("uploadedFiles"));
+const staticFilesServer = createServer(app);
 
 const main = async () => {
   try {
@@ -96,6 +104,9 @@ const main = async () => {
       console.log(`🚀  Server ready at ${url}`);
       // eslint-disable-next-line no-console
       console.log(`🚀  Subscriptions ready at ${subscriptionsUrl}`);
+
+      staticFilesServer.listen(4001);
+      console.log(`🚀  Static files ready http://localhost:4001/uploadedFiles`);
     });
   } catch (err) {
     // eslint-disable-next-line no-console

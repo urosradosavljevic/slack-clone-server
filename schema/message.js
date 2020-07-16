@@ -5,10 +5,12 @@ export default gql`
 
   type Message {
     id: Int!
-    text: String!
+    text: String
     user: User!
     channel: Channel!
     createdAt: Date!
+    url: String
+    filetype: String
   }
 
   type Subscription {
@@ -26,6 +28,6 @@ export default gql`
   }
 
   type Mutation {
-    sendMessage(channelId: Int!, text: String!): MessageResponse!
+    sendMessage(channelId: Int!, text: String, file: Upload): MessageResponse!
   }
 `;

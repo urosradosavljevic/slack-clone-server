@@ -35,6 +35,8 @@
     "axios": "^0.19.2",
     "bcrypt": "^4.0.1",
     "express": "^4.17.1",
+    "fs": "0.0.1-security",
+    "graphql-upload": "^11.0.0",
     "http": "0.0.1-security",
     "jsonwebtoken": "^8.5.1",
     "lodash": "^4.17.15",

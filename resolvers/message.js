@@ -1,8 +1,10 @@
 import { PubSub, withFilter } from "apollo-server";
+import { createWriteStream } from "fs";
 
 import { formatErrors } from "../helpers/formatErrors";
 import { requiresAuth } from "../helpers/permissions";
 import pubsub from "../pubsub";
+import { SERVER_FILES_URL } from "../constants/routes";
 
 const NEW_CHANNEL_MESSAGE = "NEW_CHANNEL_MESSAGE";
 // publish subscribe engine
@@ -31,8 +33,22 @@ export default {
   Mutation: {
     sendMessage: async (parent, args, { models, user }) => {
       try {
+        const messageData = args;
+
+        if (args.file) {
+          const file = await args.file;
+
+          const { createReadStream, filename, mimetype } = file;
+          const fileStream = createReadStream();
+
+          fileStream.pipe(createWriteStream(`./uploadedFiles/${filename}`));
+
+          messageData.filetype = mimetype;
+          messageData.url = `${SERVER_FILES_URL}${filename}`;
+        }
+
         const message = await models.Message.create({
-          ...args,
+          ...messageData,
           userId: user.id,
         });
 
