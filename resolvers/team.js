@@ -6,7 +6,9 @@ export default {
     teamMembers: requiresAuth.createResolver(
       async (parent, { teamId }, { models, user }) =>
         models.sequelize.query(
-          "select * from users as u join members as member on member.user_id = u.id where member.team_id = ?",
+          `select * 
+          from users as u join members as member on member.user_id = u.id 
+          where member.team_id = ?`,
           {
             replacements: [teamId],
             model: models.User,
@@ -160,14 +162,16 @@ export default {
     channels: async ({ id }, args, { models, user }) => {
       const channels = await models.sequelize.query(
         `select distinct on (c.id) c.id,c.name,c.public 
-          from channels as c join pcmembers as m on c.id = m.channel_id 
-          where c.team_id = :teamId and (c.public = true or (m.user_id = :currentUserId))`,
+          from channels as c left outer join pcmembers as m on c.id = m.channel_id 
+          where (c.team_id = :teamId and c.public = true) or (c.public = false and m.user_id = :currentUserId)`,
         {
           replacements: { currentUserId: user.id, teamId: id },
           model: models.Channel,
           raw: true,
         }
       );
+      console.log("channels", channels);
+      console.log("kanali");
       return channels;
     },
 
