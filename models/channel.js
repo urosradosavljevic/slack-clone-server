@@ -10,7 +10,11 @@ export default (sequelize, DataTypes) => {
     });
     // N:M
     Channel.belongsToMany(models.User, {
-      through: "channel_member",
+      through: models.Member,
+      foreignKey: { name: "channelId", field: "channel_id" },
+    });
+    Channel.belongsToMany(models.User, {
+      through: models.PCMember,
       foreignKey: { name: "channelId", field: "channel_id" },
     });
   };

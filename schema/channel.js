@@ -19,7 +19,8 @@ export default gql`
     createChannel(
       teamId: Int!
       name: String!
-      public: Boolean = false
+      members: [Int]
+      public: Boolean = true
     ): CreateChannelResponse!
   }
 `;
