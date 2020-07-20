@@ -21,7 +21,7 @@ export default {
   },
   Query: {
     channelMessages: requiresAuth.createResolver(
-      async (parent, { channelId, offset }, { models, user }) => {
+      async (parent, { channelId, cursor }, { models, user }) => {
         const channel = await models.Channel.findOne(
           { where: { id: channelId } },
           { raw: true }
@@ -37,15 +37,19 @@ export default {
           }
         }
 
-        const messages = await models.Message.findAll(
-          {
-            order: [["createdAt", "DESC"]],
-            where: { channelId },
-            limit: 5,
-            offset,
-          },
-          { raw: true }
-        );
+        const options = {
+          order: [["createdAt", "DESC"]],
+          where: { channelId },
+          limit: 15,
+        };
+
+        if (cursor && cursor !== "") {
+          options.where.created_at = {
+            [models.Sequelize.Op.lt]: cursor,
+          };
+        }
+
+        const messages = await models.Message.findAll(options, { raw: true });
 
         return messages;
       }
