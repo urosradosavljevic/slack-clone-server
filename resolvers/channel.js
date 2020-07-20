@@ -44,7 +44,7 @@ export default {
               });
 
               const channelName = users.map((u) => u.username).join(", ");
-              console.log("channelName", channelName);
+
               const channel = await models.Channel.create(
                 {
                   name: channelName,
@@ -76,7 +76,6 @@ export default {
             channel: response.dataValues,
           };
         } catch (err) {
-          console.log(err);
           return {
             ok: false,
             errors: formatErrors(err, models),

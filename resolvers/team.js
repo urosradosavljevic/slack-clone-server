@@ -171,8 +171,6 @@ export default {
           raw: true,
         }
       );
-      console.log("channels", channels);
-      console.log("kanali");
       return channels;
     },
   },
