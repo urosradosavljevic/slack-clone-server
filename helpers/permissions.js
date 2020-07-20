@@ -23,23 +23,3 @@ export const teamMemberAuth = createResolver((parent, args, context) => {
     throw new Error("Not authenticated");
   }
 });
-
-// runs child resolver, if we don't get an error from passed resolver
-export const directMessageSubscriptionAuth = createResolver(
-  async (parent, { teamId, userId }, { user, models }) => {
-    if (!user || !user.id) {
-      throw new Error("Not authenticated");
-    }
-    const members = await models.Member.findAll({
-      where: {
-        teamId,
-        [models.Sequelize.Op.or]: [{ userId }, { userId: user.id }],
-      },
-    });
-    if (members.length !== 2) {
-      if (userId !== user.id) {
-        throw new Error("Something went wrong!");
-      }
-    }
-  }
-);

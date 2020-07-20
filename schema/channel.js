@@ -5,6 +5,7 @@ export default gql`
     id: Int!
     name: String!
     public: Boolean!
+    dm: Boolean!
     messages: [Message!]!
     members: [User!]!
   }
@@ -22,5 +23,6 @@ export default gql`
       members: [Int]
       public: Boolean = true
     ): CreateChannelResponse!
+    getOrCreateDMChannel(teamId: Int!, members: [Int]): CreateChannelResponse!
   }
 `;

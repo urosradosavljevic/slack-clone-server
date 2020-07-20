@@ -161,9 +161,10 @@ export default {
   Team: {
     channels: async ({ id }, args, { models, user }) => {
       const channels = await models.sequelize.query(
-        `select distinct on (c.id) c.id,c.name,c.public 
+        `select distinct on (c.id) c.id,c.name,c.public,c.dm  
           from channels as c left outer join pcmembers as m on c.id = m.channel_id 
-          where (c.team_id = :teamId and c.public = true) or (c.public = false and m.user_id = :currentUserId)`,
+          where c.team_id = :teamId and (c.public = true or m.user_id = :currentUserId)`,
+
         {
           replacements: { currentUserId: user.id, teamId: id },
           model: models.Channel,
@@ -174,17 +175,5 @@ export default {
       console.log("kanali");
       return channels;
     },
-
-    directMessagedMembers: async ({ id }, args, { models, user }) =>
-      models.sequelize.query(
-        `select distinct on (u.id) u.id,u.email,u.username,u.password 
-        from users as u join direct_messages as dm on (u.id = dm.sender_id) or (u.id = dm.receiver_id) 
-        where (:currentUserId = dm.sender_id or :currentUserId = dm.receiver_id) and dm.team_id = :teamId`,
-        {
-          replacements: { currentUserId: user.id, teamId: id },
-          model: models.User,
-          raw: true,
-        }
-      ),
   },
 };
