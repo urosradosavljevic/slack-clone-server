@@ -1,8 +1,9 @@
 import bcrypt from "bcrypt";
 import _ from "lodash";
-import { tryLogin } from "../helpers/auth";
+
+import { tryLogin } from "../util/auth";
 import { formatErrors } from "../helpers/formatErrors";
-import { requiresAuth } from "../helpers/permissions";
+import { requiresAuth } from "../util/permissions";
 
 export default {
   User: {

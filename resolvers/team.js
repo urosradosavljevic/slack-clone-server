@@ -1,5 +1,5 @@
 import { formatErrors } from "../helpers/formatErrors";
-import { requiresAuth } from "../helpers/permissions";
+import { requiresAuth } from "../util/permissions";
 
 export default {
   Query: {
@@ -159,19 +159,6 @@ export default {
     ),
   },
   Team: {
-    channels: async ({ id }, args, { models, user }) => {
-      const channels = await models.sequelize.query(
-        `select distinct on (c.id) c.id,c.name,c.public,c.dm  
-          from channels as c left outer join pcmembers as m on c.id = m.channel_id 
-          where c.team_id = :teamId and (c.public = true or m.user_id = :currentUserId)`,
-
-        {
-          replacements: { currentUserId: user.id, teamId: id },
-          model: models.Channel,
-          raw: true,
-        }
-      );
-      return channels;
-    },
+    channels: async ({ id }, args, { channelLoader }) => channelLoader.load(id),
   },
 };

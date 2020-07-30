@@ -1,5 +1,5 @@
 import { formatErrors } from "../helpers/formatErrors";
-import { requiresAuth } from "../helpers/permissions";
+import { requiresAuth } from "../util/permissions";
 
 export default {
   Mutation: {

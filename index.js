@@ -1,12 +1,14 @@
 import { ApolloServer } from "apollo-server";
 import express from "express";
 import { createServer } from "http";
-
+import DataLoader from "dataloader";
 import path from "path";
 import { fileLoader, mergeTypes, mergeResolvers } from "merge-graphql-schemas";
 import jwt from "jsonwebtoken";
+
 import models from "./models";
-import { refreshTokens } from "./helpers/auth";
+import { refreshTokens } from "./util/auth";
+import { channelBatcher } from "./util/batchFunctions";
 
 // constants
 const SECRET = "asdfnaiu12408u931kljd";
@@ -59,12 +61,15 @@ const server = new ApolloServer({
     }
     // http connection context
     const token = req.headers["x-token"];
-
+    let channelLoader;
     try {
       // verifying token
       const { user } = jwt.verify(token, SECRET);
-
-      return { models, user, SECRET, SECRET2 };
+      // DataLoader
+      channelLoader = new DataLoader((ids) =>
+        channelBatcher(ids, models, user)
+      );
+      return { models, user, SECRET, SECRET2, channelLoader };
     } catch (error) {
       // get refresh token
       const refreshToken = req.headers["x-refresh-token"];
@@ -82,7 +87,11 @@ const server = new ApolloServer({
         res.set("Access-Control-Expose-Headers", "x-token", "x-refresh-token");
         res.set("x-token", newTokens.token);
         res.set("x-refresh-token", newTokens.refreshToken);
-        return { models, user: newTokens.user, SECRET, SECRET2 };
+        // DataLoader
+        channelLoader = new DataLoader((ids) =>
+          channelBatcher(ids, models, newTokens.user)
+        );
+        return { models, user: newTokens.user, SECRET, SECRET2, channelLoader };
       }
       // token is unavailable
       return { models, user: null, SECRET, SECRET2 };

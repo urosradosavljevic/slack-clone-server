@@ -2,8 +2,8 @@ import { PubSub, withFilter } from "apollo-server";
 import { createWriteStream } from "fs";
 
 import { formatErrors } from "../helpers/formatErrors";
-import { requiresAuth } from "../helpers/permissions";
-import pubsub from "../pubsub";
+import { requiresAuth } from "../util/permissions";
+import pubsub from "../util/pubsub";
 import { SERVER_FILES_URL } from "../constants/routes";
 
 const NEW_CHANNEL_MESSAGE = "NEW_CHANNEL_MESSAGE";
