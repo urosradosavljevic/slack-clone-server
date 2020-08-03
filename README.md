@@ -1,4 +1,4 @@
-# Slack Node.js JavScript Apollo Server PostgreSQL
+# Slack Node.js JavaScript Apollo Server PostgreSQL
   
 * **Used:** 
   * Node.js
